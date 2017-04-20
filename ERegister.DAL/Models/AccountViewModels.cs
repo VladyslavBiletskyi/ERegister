@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace ERegister.Models
+namespace ERegister.DAL.Models
 {
     // Модели, возвращаемые действиями AccountController.
 

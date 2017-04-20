@@ -13,9 +13,10 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
-using ERegister.Models;
+using ERegister.DAL.Models;
 using ERegister.Providers;
 using ERegister.Results;
+using ApplicationUser = ERegister.DAL.Models.ApplicationUser;
 
 namespace ERegister.Controllers
 {

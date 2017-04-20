@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERegister", "ERegister\ERegister.csproj", "{5B0F0257-D8D4-45D9-ABA1-C8578FB10E7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERegister.PL", "ERegister\ERegister.PL.csproj", "{5B0F0257-D8D4-45D9-ABA1-C8578FB10E7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERegister.DAL", "ERegister.DAL\ERegister.DAL.csproj", "{A3D2C881-4BB9-41C3-A7D4-B386C66A4556}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERegister.BLL", "ERegister.BLL\ERegister.BLL.csproj", "{72AF86B2-1E44-4461-9853-BB9501740A89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{5B0F0257-D8D4-45D9-ABA1-C8578FB10E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B0F0257-D8D4-45D9-ABA1-C8578FB10E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B0F0257-D8D4-45D9-ABA1-C8578FB10E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3D2C881-4BB9-41C3-A7D4-B386C66A4556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3D2C881-4BB9-41C3-A7D4-B386C66A4556}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3D2C881-4BB9-41C3-A7D4-B386C66A4556}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3D2C881-4BB9-41C3-A7D4-B386C66A4556}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72AF86B2-1E44-4461-9853-BB9501740A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72AF86B2-1E44-4461-9853-BB9501740A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72AF86B2-1E44-4461-9853-BB9501740A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72AF86B2-1E44-4461-9853-BB9501740A89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
