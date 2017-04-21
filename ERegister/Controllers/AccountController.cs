@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,9 +16,10 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
 using ERegister.DAL.Models;
+using ERegister.DAL.Models.Interfaces;
 using ERegister.Providers;
 using ERegister.Results;
-using ApplicationUser = ERegister.DAL.Models.ApplicationUser;
+using ERegister.ViewModels;
 
 namespace ERegister.Controllers
 {
@@ -26,16 +29,18 @@ namespace ERegister.Controllers
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
-
-        public AccountController()
+        private IRepository<Group> repository;
+        public AccountController(IRepository<Group> repository)
         {
+            this.repository = repository;
         }
 
         public AccountController(ApplicationUserManager userManager,
-            ISecureDataFormat<AuthenticationTicket> accessTokenFormat)
+            ISecureDataFormat<AuthenticationTicket> accessTokenFormat, IRepository<Group> repository)
         {
             UserManager = userManager;
             AccessTokenFormat = accessTokenFormat;
+            this.repository = repository;
         }
 
         public ApplicationUserManager UserManager
@@ -115,6 +120,29 @@ namespace ERegister.Controllers
             };
         }
 
+        [Route("CangeUser")]
+        public IHttpActionResult ChangeUserInfo(ChangeUserInfoModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
+            if (user == null)
+            {
+                var msg = new HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Oops!!!" };
+                throw new HttpResponseException(msg);
+            }
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Group = repository.GetAll().FirstOrDefault(x => x.Name == model.Group);
+            if (user.Group == null)
+            {
+                return BadRequest("Group is invalid");
+            }
+            UserManager.Update(user);
+            return Ok();
+        }
         // POST api/Account/ChangePassword
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
@@ -319,17 +347,22 @@ namespace ERegister.Controllers
             return logins;
         }
 
-        // POST api/Account/Register
         [AllowAnonymous]
         [Route("Register")]
-        public async Task<IHttpActionResult> Register(RegisterBindingModel model)
+        public async Task<IHttpActionResult> Register(SignUpViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser() {
+                UserName = model.Email,
+                Email = model.Email,
+                Group =repository.GetAll().FirstOrDefault(x=>x.Name==model.Group),
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 

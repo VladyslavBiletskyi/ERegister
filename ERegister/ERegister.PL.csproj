@@ -256,6 +256,10 @@
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Util\RepositoryModule.cs" />
+    <Compile Include="ViewModels\ChangeUserInfoModel.cs" />
+    <Compile Include="ViewModels\GetUserViewModel.cs" />
+    <Compile Include="ViewModels\SignInViewModel.cs" />
+    <Compile Include="ViewModels\SignUpViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

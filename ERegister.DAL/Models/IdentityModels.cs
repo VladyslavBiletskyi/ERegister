@@ -16,5 +16,7 @@ namespace ERegister.DAL.Models
             return userIdentity;
         }
         public virtual Group Group { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }
