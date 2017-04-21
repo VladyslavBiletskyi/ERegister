@@ -14,7 +14,6 @@ using Microsoft.AspNet.Identity.Owin;
 
 namespace ERegister.Controllers
 {
-   
     [Authorize]
     [RoutePrefix("api/Lessons")]
     public class LessonsController : ApiController
@@ -27,16 +26,13 @@ namespace ERegister.Controllers
             this.attendService = attendService;
         }
 
-        public ApplicationUserManager UserManager
-        {
-            get { return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
-        }
+        //public ApplicationUserManager UserManager => _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
         [HttpGet]
         [Route("Absents")]
         public async Task<List<LessonViewModel>> GetAbsents()
         {
-            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            ApplicationUser user = null;//await UserManager.FindByIdAsync(User.Identity.GetUserId());
             List<LessonDto> absents = attendService.GetAbsents(user);
             List<LessonViewModel> model = new List<LessonViewModel>();
             foreach (var element in absents)
@@ -54,6 +50,5 @@ namespace ERegister.Controllers
             }
             return model;
         }
-
     }
 }

@@ -10,6 +10,11 @@ namespace ERegister.DAL.Models.Initialize
             {
                 Name = "SE-14-5"
             });
+            context.Roles.Add(new Microsoft.AspNet.Identity.EntityFramework.IdentityRole
+            {
+                Id = "Student",
+                Name = "Student"
+            });
             context.SaveChanges();
         }
     }

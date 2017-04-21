@@ -378,7 +378,7 @@ namespace ERegister.Controllers
             var user = new ApplicationUser() {
                 UserName = model.Email,
                 Email = model.Email,
-                Group =repository.GetAll().FirstOrDefault(x=>x.Name==model.Group),
+                //Group =repository.GetAll().FirstOrDefault(x=>x.Name==model.Group),
                 FirstName = model.FirstName,
                 LastName = model.LastName
             };

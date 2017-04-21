@@ -19,7 +19,7 @@ namespace ERegister.ViewModels
         public string Email { get; set; }
         [Required]
         [Display(Name = "Группа")]
-        public string Group { get; set; }
+        public int Group { get; set; }
         [Required]
         [StringLength(20, ErrorMessage = "Значение {0} должно содержать не менее {2} символов.", MinimumLength = 6)]
         [DataType(DataType.Password)]
