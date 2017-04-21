@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -64,12 +65,30 @@ namespace ERegister.Controllers
         {
             ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
 
-            return new UserInfoViewModel
+            return new DAL.Models.UserInfoViewModel
             {
                 Email = User.Identity.GetUserName(),
                 HasRegistered = externalLogin == null,
                 LoginProvider = externalLogin != null ? externalLogin.LoginProvider : null
             };
+        }
+
+        [Route("GetUserInfo")]
+        [HttpGet]
+        public UserDetailsViewModel GetUser()
+        {
+            ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
+            if (user == null)
+            {
+                return null;
+            }
+            UserDetailsViewModel model = new UserDetailsViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Group = user.Group.Name
+            };
+            return model;
         }
 
         // POST api/Account/Logout
@@ -121,7 +140,7 @@ namespace ERegister.Controllers
         }
 
         [Route("CangeUser")]
-        public IHttpActionResult ChangeUserInfo(ChangeUserInfoModel model)
+        public IHttpActionResult ChangeUserInfo(ViewModels.UserDetailsViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -363,7 +382,11 @@ namespace ERegister.Controllers
                 FirstName = model.FirstName,
                 LastName = model.LastName
             };
-
+            user.Roles.Add(new IdentityUserRole
+            {
+                RoleId="Student",
+                UserId=user.Id
+            });
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)

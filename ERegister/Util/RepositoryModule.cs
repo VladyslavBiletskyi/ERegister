@@ -16,6 +16,9 @@ namespace ERegister.Util
         {
             this.Bind<IDataContext>().To<ERegisterDbContext>().InRequestScope();
             this.Bind<IRepository<Group>>().To<GroupsRepository>().InRequestScope();
+            this.Bind<IRepository<Lesson>>().To<LessonsRepository>().InRequestScope();
+            this.Bind<IRepository<Attend>>().To<AttendsRepository>().InRequestScope();
+            this.Bind<IRepository<Mark>>().To<MarksRepository>().InRequestScope();
         }
     }
 }

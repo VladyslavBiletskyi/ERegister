@@ -2,7 +2,7 @@
 
 namespace ERegister.ViewModels
 {
-    public class ChangeUserInfoModel
+    public class UserDetailsViewModel
     {
         [Required]
         [Display(Name = "Имя пользователя")]

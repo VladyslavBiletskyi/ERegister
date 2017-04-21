@@ -65,7 +65,11 @@
     <Compile Include="Models\Interfaces\IRepository.cs" />
     <Compile Include="Models\Lesson.cs" />
     <Compile Include="Models\Mark.cs" />
+    <Compile Include="Models\Repositories\AttendControlsRepository.cs" />
+    <Compile Include="Models\Repositories\AttendsRepository.cs" />
+    <Compile Include="Models\Repositories\MarksRepository.cs" />
     <Compile Include="Models\Repositories\GroupsRepository.cs" />
+    <Compile Include="Models\Repositories\LessonsRepository.cs" />
     <Compile Include="Models\Subject.cs" />
     <Compile Include="Models\SubjectOfTheGroup.cs" />
     <Compile Include="Models\ViewModels\GroupViewModel.cs" />
