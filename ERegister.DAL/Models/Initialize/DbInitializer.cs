@@ -1,16 +1,17 @@
 ﻿using System.Data.Entity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace ERegister.DAL.Models.Initialize
 {
-    public class DbInitializer:DropCreateDatabaseIfModelChanges<ERegisterDbContext>
+    public class DbInitializer:DropCreateDatabaseAlways<ERegisterDbContext>
     {
         protected override void Seed(ERegisterDbContext context)
         {
-            context.Groups.Add(new Group
+            context.Set<Group>().Add(new Group
             {
                 Name = "SE-14-5"
             });
-            context.Roles.Add(new Microsoft.AspNet.Identity.EntityFramework.IdentityRole
+            context.Set<IdentityRole>().Add(new IdentityRole
             {
                 Id = "Student",
                 Name = "Student"

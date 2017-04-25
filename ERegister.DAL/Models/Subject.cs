@@ -2,9 +2,8 @@
 
 namespace ERegister.DAL.Models
 {
-    public class Subject
+    public class Subject : BaseEntity
     {
-        [Key]
         public string Name { get; set; }
     }
 }

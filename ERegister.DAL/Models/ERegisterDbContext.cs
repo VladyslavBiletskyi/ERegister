@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Reflection;
 using ERegister.DAL.Models.Interfaces;
 using Microsoft.AspNet.Identity.EntityFramework;
 
@@ -6,21 +7,21 @@ namespace ERegister.DAL.Models
 {
     public class ERegisterDbContext : IdentityDbContext<ApplicationUser>, IDataContext
     {
+        private static int id = 0;
+
+        private int idObj = ++id;
+
         public ERegisterDbContext() : base("ERegisterDB", throwIfV1Schema: false)
         {
         }
-
-        public DbSet<Group> Groups { get; set; }
-        public DbSet<Subject> Subjects { get; set; }
-        public DbSet<Lesson> Lessons { get; set; }
-        public DbSet<Attend> Attends { get; set; }
-        public DbSet<AttendControl> AttendControls { get; set; }
-        public DbSet<Mark> Marks { get; set; }
-        public DbSet<SubjectOfTheGroup> SubjectsOfGroups { get; set; }
-
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Configurations.AddFromAssembly(Assembly.GetAssembly(typeof(ERegisterDbContext)));
+        }
         public static ERegisterDbContext Create()
         {
             return new ERegisterDbContext();
         }
+
     }
 }

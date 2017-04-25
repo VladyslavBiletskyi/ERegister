@@ -2,9 +2,8 @@
 
 namespace ERegister.DAL.Models
 {
-    public class Mark
+    public class Mark : BaseEntity
     {
-        public int Id { get; set; }
         public virtual ApplicationUser Student { get; set; }
         public virtual ApplicationUser Teacher { get; set; }
 

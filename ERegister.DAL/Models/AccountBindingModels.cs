@@ -33,6 +33,15 @@ namespace ERegister.DAL.Models
     public class RegisterBindingModel
     {
         [Required]
+        [Display(Name = "Имя пользователя")]
+        public string FirstName { get; set; }
+        [Required]
+        [Display(Name = "Фамилия пользователя")]
+        public string LastName { get; set; }
+        [Required]
+        [Display(Name = "Группа пользователя")]
+        public int Group { get; set; }
+        [Required]
         [Display(Name = "Адрес электронной почты")]
         public string Email { get; set; }
 
