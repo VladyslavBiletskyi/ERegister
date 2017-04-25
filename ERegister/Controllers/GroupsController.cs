@@ -10,9 +10,9 @@ namespace ERegister.Controllers
     [RoutePrefix("api/Groups")]
     public class GroupsController : ApiController
     {
-        private IRepository<Group> repository;
+        private IGroupsRepository repository;
 
-        public GroupsController(IRepository<Group> repository)
+        public GroupsController(IGroupsRepository repository)
         {
             this.repository = repository;
         }

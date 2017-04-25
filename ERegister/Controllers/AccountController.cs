@@ -18,6 +18,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
 using ERegister.DAL.Models;
 using ERegister.DAL.Models.Interfaces;
+using ERegister.DAL.Models.ViewModels;
 using ERegister.Providers;
 using ERegister.Results;
 using ERegister.ViewModels;
@@ -29,32 +30,23 @@ namespace ERegister.Controllers
     public class AccountController : ApiController
     {
         private const string LocalLoginProvider = "Local";
-        private ApplicationUserManager _userManager;
-        private IRepository<Group> repository;
-        public AccountController(IRepository<Group> repository)
+        private IGroupsRepository repository;
+
+        public AccountController(IGroupsRepository repository)
         {
             this.repository = repository;
+            UserManager = userManager;
         }
 
-        public AccountController(ApplicationUserManager userManager,
-            ISecureDataFormat<AuthenticationTicket> accessTokenFormat, IRepository<Group> repository)
+        public AccountController(DAL.Models.Identity.ApplicationUserManager userManager,
+            ISecureDataFormat<AuthenticationTicket> accessTokenFormat, IGroupsRepository repository)
         {
             UserManager = userManager;
             AccessTokenFormat = accessTokenFormat;
             this.repository = repository;
         }
 
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
+        public DAL.Models.Identity.ApplicationUserManager UserManager { get; set; }  
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
@@ -65,7 +57,7 @@ namespace ERegister.Controllers
         {
             ExternalLoginData externalLogin = ExternalLoginData.FromIdentity(User.Identity as ClaimsIdentity);
 
-            return new DAL.Models.UserInfoViewModel
+            return new UserInfoViewModel
             {
                 Email = User.Identity.GetUserName(),
                 HasRegistered = externalLogin == null,
@@ -149,7 +141,7 @@ namespace ERegister.Controllers
             ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
             if (user == null)
             {
-                var msg = new HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Oops!!!" };
+                var msg = new HttpResponseMessage(HttpStatusCode.Unauthorized) {ReasonPhrase = "Oops!!!"};
                 throw new HttpResponseException(msg);
             }
             user.FirstName = model.FirstName;
@@ -162,6 +154,7 @@ namespace ERegister.Controllers
             UserManager.Update(user);
             return Ok();
         }
+
         // POST api/Account/ChangePassword
         [Route("ChangePassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
@@ -173,7 +166,7 @@ namespace ERegister.Controllers
 
             IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
                 model.NewPassword);
-            
+
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -215,8 +208,9 @@ namespace ERegister.Controllers
             AuthenticationTicket ticket = AccessTokenFormat.Unprotect(model.ExternalAccessToken);
 
             if (ticket == null || ticket.Identity == null || (ticket.Properties != null
-                && ticket.Properties.ExpiresUtc.HasValue
-                && ticket.Properties.ExpiresUtc.Value < DateTimeOffset.UtcNow))
+                                                              && ticket.Properties.ExpiresUtc.HasValue
+                                                              && ticket.Properties.ExpiresUtc.Value <
+                                                              DateTimeOffset.UtcNow))
             {
                 return BadRequest("Сбой внешнего входа.");
             }
@@ -306,8 +300,8 @@ namespace ERegister.Controllers
             if (hasRegistered)
             {
                 Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                
-                 ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
+
+                ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
                     OAuthDefaults.AuthenticationType);
                 ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager,
                     CookieAuthenticationDefaults.AuthenticationType);
@@ -374,18 +368,18 @@ namespace ERegister.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            var user = new ApplicationUser() {
+            var user = new ApplicationUser()
+            {
                 UserName = model.Email,
                 Email = model.Email,
-                //Group =repository.GetAll().FirstOrDefault(x=>x.Name==model.Group),
                 FirstName = model.FirstName,
-                LastName = model.LastName
-            };
+                LastName = model.LastName,
+                Group = repository.GetAll().FirstOrDefault(x => x.Id == model.Group)
+        };
             user.Roles.Add(new IdentityUserRole
             {
-                RoleId="Student",
-                UserId=user.Id
+                RoleId = "Student",
+                UserId = user.Id
             });
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 
@@ -414,7 +408,7 @@ namespace ERegister.Controllers
                 return InternalServerError();
             }
 
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+            var user = new ApplicationUser() {UserName = model.Email, Email = model.Email};
 
             IdentityResult result = await UserManager.CreateAsync(user);
             if (!result.Succeeded)
@@ -425,17 +419,17 @@ namespace ERegister.Controllers
             result = await UserManager.AddLoginAsync(user.Id, info.Login);
             if (!result.Succeeded)
             {
-                return GetErrorResult(result); 
+                return GetErrorResult(result);
             }
             return Ok();
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && _userManager != null)
+            if (disposing && UserManager != null)
             {
-                _userManager.Dispose();
-                _userManager = null;
+                UserManager.Dispose();
+                UserManager = null;
             }
 
             base.Dispose(disposing);
@@ -535,7 +529,8 @@ namespace ERegister.Controllers
 
                 if (strengthInBits % bitsPerByte != 0)
                 {
-                    throw new ArgumentException("Значение strengthInBits должно нацело делиться на 8.", "strengthInBits");
+                    throw new ArgumentException("Значение strengthInBits должно нацело делиться на 8.",
+                        "strengthInBits");
                 }
 
                 int strengthInBytes = strengthInBits / bitsPerByte;

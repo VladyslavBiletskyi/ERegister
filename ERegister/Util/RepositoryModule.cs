@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using ERegister.DAL.Models;
+﻿using ERegister.DAL.Models;
 using ERegister.DAL.Models.Interfaces;
 using ERegister.DAL.Models.Repositories;
 using Ninject.Modules;
@@ -14,11 +10,16 @@ namespace ERegister.Util
     {
         public override void Load()
         {
+            this.Bind<ERegisterDbContext>().ToSelf().InRequestScope();
             this.Bind<IDataContext>().To<ERegisterDbContext>().InRequestScope();
-            this.Bind<IRepository<Group>>().To<GroupsRepository>().InRequestScope();
-            this.Bind<IRepository<Lesson>>().To<LessonsRepository>().InRequestScope();
-            this.Bind<IRepository<Attend>>().To<AttendsRepository>().InRequestScope();
-            this.Bind<IRepository<Mark>>().To<MarksRepository>().InRequestScope();
+
+            //this.Bind<DbContext>().ToMethod(context => (DbContext) context.Kernel.GetService(typeof(IDataContext))).InRequestScope();
+
+            this.Bind<IGroupsRepository>().To<GroupsRepository>().InRequestScope();
+            this.Bind<ILessonsRepository>().To<LessonsRepository>().InRequestScope();
+            this.Bind<IAttendsRepository>().To<AttendsRepository>().InRequestScope();
+            this.Bind<IAttendControlsRepository>().To<AttendControlsRepository>().InRequestScope();
+            this.Bind<IMarksRepository>().To<MarksRepository>().InRequestScope();
         }
     }
 }

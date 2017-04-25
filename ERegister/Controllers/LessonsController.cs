@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using ERegister.BLL.DTOs;
 using ERegister.BLL.Interfaces;
@@ -18,21 +15,23 @@ namespace ERegister.Controllers
     [RoutePrefix("api/Lessons")]
     public class LessonsController : ApiController
     {
-        private ApplicationUserManager _userManager;
         private IAttendService attendService;
-
         public LessonsController(IAttendService attendService)
         {
             this.attendService = attendService;
         }
 
-        //public ApplicationUserManager UserManager => _userManager ?? Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
-
+        private ApplicationUserManager UserManager => HttpContext.Current.GetOwinContext()
+            .GetUserManager<ApplicationUserManager>();
         [HttpGet]
         [Route("Absents")]
         public async Task<List<LessonViewModel>> GetAbsents()
         {
-            ApplicationUser user = null;//await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (user == null)
+            {
+                return new List<LessonViewModel>();
+            }
             List<LessonDto> absents = attendService.GetAbsents(user);
             List<LessonViewModel> model = new List<LessonViewModel>();
             foreach (var element in absents)
