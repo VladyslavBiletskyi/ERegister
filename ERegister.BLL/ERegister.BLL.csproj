@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTOs\LessonDto.cs" />
-    <Compile Include="Interfaces\IAttendService.cs" />
+    <Compile Include="Interfaces\IAttendsService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AttendsService.cs" />
   </ItemGroup>

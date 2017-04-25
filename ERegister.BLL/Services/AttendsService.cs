@@ -10,13 +10,13 @@ using ERegister.DAL.Models.Interfaces;
 
 namespace ERegister.BLL.Services
 {
-    public class AttendsService:IAttendService
+    public class AttendsService:IAttendsService
     {
-        private IRepository<AttendControl> attendControlsRepository;
-        private IRepository<Lesson> lessonsRepository;
-        private IRepository<Mark> marksRepository;
+        private IAttendControlsRepository attendControlsRepository;
+        private ILessonsRepository lessonsRepository;
+        private IMarksRepository marksRepository;
 
-        public AttendsService(IRepository<AttendControl> attendControlsRepository, IRepository<Lesson> lessonsRepository, IRepository<Mark> marksRepository)
+        public AttendsService(IAttendControlsRepository attendControlsRepository, ILessonsRepository lessonsRepository, IMarksRepository marksRepository)
         {
             this.attendControlsRepository = attendControlsRepository;
             this.lessonsRepository = lessonsRepository;
@@ -39,7 +39,8 @@ namespace ERegister.BLL.Services
                     NumberOfPresent = attendControlsRepository.GetAll()
                                           .FirstOrDefault(x => x.Lesson == element)
                                           ?.Attends.Count ?? 0,
-                    AverageMark = marksRepository.GetAll().Where(x => x.Lesson == element).Average(x => x.Result)
+                    AverageMark = marksRepository.GetAll().
+                    Where(x => x.Lesson == element).Average(x => x.Result)
                 });
             }
             return answer;

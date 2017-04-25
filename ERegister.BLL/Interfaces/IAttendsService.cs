@@ -4,7 +4,7 @@ using ERegister.DAL.Models;
 
 namespace ERegister.BLL.Interfaces
 {
-    public interface IAttendService
+    public interface IAttendsService
     {
         List<LessonDto> GetAbsents(ApplicationUser user);
     }
