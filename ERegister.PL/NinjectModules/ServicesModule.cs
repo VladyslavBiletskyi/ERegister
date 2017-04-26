@@ -9,7 +9,7 @@ namespace ERegister.PL.NinjectModules
     {
         public override void Load()
         {
-            Bind<IAttendsService>().To<AttendsService>().InRequestScope();
+            Bind<IDebtsService>().To<DebtsService>().InRequestScope();
         }
     }
 }

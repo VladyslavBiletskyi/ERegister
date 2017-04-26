@@ -51,8 +51,7 @@ namespace ERegister.PL.Controllers
         {
             get
             {
-                return _userManager ?? (_userManager =
-                           new ApplicationUserManager(new UserStore<ApplicationUser>((DbContext)Context)));
+                return _userManager ?? (_userManager = new ApplicationUserManager(new UserStore<ApplicationUser>((DbContext)Context)));
             }
             private set
             {
@@ -62,6 +61,18 @@ namespace ERegister.PL.Controllers
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
+        [Route("GetUserInfo")]
+        [HttpGet]
+        public UserViewModel GetUserInfoModel()
+        {
+            ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
+            if (user == null)
+            {
+                return null;
+            }
+            var model = new UserViewModel { FirstName = user.FirstName, LastName = user.LastName, Group = user.Group?.Name};
+            return model;
+        }
         // GET api/Account/UserInfo
         [HostAuthentication(DefaultAuthenticationTypes.ExternalBearer)]
         [Route("UserInfo")]
@@ -351,14 +362,12 @@ namespace ERegister.PL.Controllers
                 LastName = model.LastName,
                 Group = group
             };
-
-            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
-            
+            user.Roles.Add(new IdentityUserRole {RoleId = "Student", UserId = user.Id});
+            IdentityResult result = await UserManager.CreateAsync(user, model.Password);           
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
             }
-
             return Ok();
         }
 

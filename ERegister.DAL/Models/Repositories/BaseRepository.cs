@@ -13,11 +13,6 @@ namespace ERegister.DAL.Models.Repositories
             this.context = context;
         }
 
-        public IDataContext GetContext()
-        {
-            return context;
-        }
-
         public void Add(T entity)
         {
             context.Set<T>().Add(entity);
