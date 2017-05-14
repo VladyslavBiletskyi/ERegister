@@ -6,10 +6,15 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 namespace ERegister.DAL.Models.Initialize
 {
-    public class DbInitializer : DropCreateDatabaseAlways<ERegisterDbContext>
+    public class DbInitializer : DropCreateDatabaseIfModelChanges<ERegisterDbContext>
     {
         protected override void Seed(ERegisterDbContext context)
         {
+            context.Set<Group>()
+                .Add(new Group
+                {
+                    Name = "Teachers"
+                });
             context.Set<Group>()
                 .Add(new Group
                 {

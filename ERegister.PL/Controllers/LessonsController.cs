@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using ERegister.BLL.DTOs;
@@ -21,8 +22,12 @@ namespace ERegister.PL.Controllers
     [Authorize]
     public class LessonsController : ApiController
     {
+
         private ILessonsRepository lessonsRepository;
-        private IAttendControlsRepository attendsRepository;
+        private IAttendControlsRepository attendControlsRepository;
+        private ISubjectsRepository subjectsRepository;
+        private IGroupSubjectsRepository groupSubjectsRepository;
+        private IGroupsRepository groupsRepository;
         private IDebtsService debtsService;
         private ApplicationUserManager _userManager;
 
@@ -41,11 +46,51 @@ namespace ERegister.PL.Controllers
             }
         }
 
-        public LessonsController(ILessonsRepository lessons, IAttendControlsRepository attends, IDebtsService attendsService)
+        public LessonsController(ILessonsRepository lessons, IAttendControlsRepository attends, IDebtsService attendsService, ISubjectsRepository subjectsRepository, IGroupSubjectsRepository groupSubjectsRepository, IGroupsRepository groupsRepository)
         {
             this.lessonsRepository = lessons;
-            this.attendsRepository = attends;
+            this.attendControlsRepository = attends;
             this.debtsService = attendsService;
+            this.subjectsRepository = subjectsRepository;
+            this.groupSubjectsRepository = groupSubjectsRepository;
+            this.groupsRepository = groupsRepository;
+        }
+
+        [Route("AddLesson")]
+        [HttpPost]
+        [Authorize(Roles = "Teacher")]
+        public async Task<IHttpActionResult> AddLesson(AddLessonViewModel model)
+        {
+            if (model.BeginingDateTime.Date < DateTime.Now.Date)
+            {
+                return BadRequest("Wrong date or time");
+            }
+            Subject subject = await subjectsRepository.GetAll().FirstOrDefaultAsync(x => x.Id == model.SubjectId);
+            if (subject == null)
+            {
+                return BadRequest("Wrong subject");
+            }
+            SubjectOfTheGroup groupSubject = await groupSubjectsRepository.GetAll().FirstOrDefaultAsync(x => x.Subject == subject);
+            if (groupSubject == null)
+            {
+                groupSubject = new SubjectOfTheGroup
+                {
+                    Group = await groupsRepository.GetAll().FirstOrDefaultAsync(y => y.Id == model.GroupId),
+                    Subject = subject,
+                    Teacher = await UserManager.FindByIdAsync(User.Identity.GetUserId())
+                };
+                groupSubjectsRepository.Add(groupSubject);
+                groupSubjectsRepository.SaveChanges();
+            }
+            lessonsRepository.Add(new Lesson
+            {
+                BeginigDateTime = model.BeginingDateTime,
+                Room = model.Room,
+                Subject = groupSubject,
+                Teacher = await UserManager.FindByIdAsync(User.Identity.GetUserId())
+            });
+            lessonsRepository.SaveChanges();
+            return Ok();
         }
 
         [Route("Absents")]
@@ -96,7 +141,7 @@ namespace ERegister.PL.Controllers
                 {
                     BeginigDateTime = element.Lesson.BeginigDateTime,
                     AverageMark = element.AverageMark,
-                    IsPresent = attendsRepository.GetAll()
+                    IsPresent = attendControlsRepository.GetAll()
                                     .FirstOrDefault(x => x.Lesson == element.Lesson)
                                     ?.Attends.Count(x => x.Student == user) != 0,
                     NumberOfPresent = element.NumberOfPresent,

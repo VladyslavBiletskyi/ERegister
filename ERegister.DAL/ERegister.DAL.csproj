@@ -70,6 +70,8 @@
     <Compile Include="Models\Identity\ApplicationUserManager.cs" />
     <Compile Include="Models\Interfaces\IAttendsRepository.cs" />
     <Compile Include="Models\Interfaces\IAttendControlsRepository.cs" />
+    <Compile Include="Models\Interfaces\IGroupSubjectsRepository.cs" />
+    <Compile Include="Models\Interfaces\ISubjectsRepository.cs" />
     <Compile Include="Models\Interfaces\ILessonsRepository.cs" />
     <Compile Include="Models\Interfaces\IMarksRepository.cs" />
     <Compile Include="Models\Interfaces\IGroupsRepository.cs" />
@@ -87,6 +89,8 @@
     <Compile Include="Models\Repositories\AttendControlsRepository.cs" />
     <Compile Include="Models\Repositories\AttendsRepository.cs" />
     <Compile Include="Models\Repositories\BaseRepository.cs" />
+    <Compile Include="Models\Repositories\GroupSubjectsRepository.cs" />
+    <Compile Include="Models\Repositories\SubjectsRepository.cs" />
     <Compile Include="Models\Repositories\MarksRepository.cs" />
     <Compile Include="Models\Repositories\GroupsRepository.cs" />
     <Compile Include="Models\Repositories\LessonsRepository.cs" />

@@ -19,6 +19,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
 using ERegister.PL.Providers;
 using ERegister.PL.Results;
+using ERegister.PL.ViewModels;
 using Ninject;
 
 namespace ERegister.PL.Controllers
@@ -29,11 +30,11 @@ namespace ERegister.PL.Controllers
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
-        private IGroupsRepository repository;
+        private IGroupsRepository groupsRepository;
 
         public AccountController(IGroupsRepository repository)
         {
-            this.repository = repository;
+            this.groupsRepository = repository;
         }
 
         public AccountController(ApplicationUserManager userManager,
@@ -41,7 +42,7 @@ namespace ERegister.PL.Controllers
         {
             UserManager = userManager;
             AccessTokenFormat = accessTokenFormat;
-            this.repository = repository;
+            this.groupsRepository = repository;
         }
 
         [Inject]
@@ -88,6 +89,46 @@ namespace ERegister.PL.Controllers
             };
         }
 
+        [HttpPost]
+        [Route("AddTeacher")]
+        [AllowAnonymous]
+        public async Task<IHttpActionResult> AddTeacher(RegisterBindingModel model)
+        {
+            Group group = await groupsRepository.GetAll().FirstOrDefaultAsync(x => x.Name == "Teachers");
+            if (group != null)
+            {
+                model.Group = group.Id;
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = new ApplicationUser()
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Group = group
+            };
+            user.Roles.Add(new IdentityUserRole { RoleId = "Teacher", UserId = user.Id });
+            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                return GetErrorResult(result);
+            }
+            return Ok();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("GetRole")]
+        public string GetRole()
+        {
+            return UserManager.FindById(User.Identity.GetUserId())?.Roles.FirstOrDefault()?.RoleId;
+        }
+        
+#region trash
         // POST api/Account/Logout
         [Route("Logout")]
         public IHttpActionResult Logout()
@@ -339,7 +380,7 @@ namespace ERegister.PL.Controllers
 
             return logins;
         }
-
+#endregion
         // POST api/Account/Register
         [AllowAnonymous]
         [Route("Register")]
@@ -349,7 +390,7 @@ namespace ERegister.PL.Controllers
             {
                 return BadRequest(ModelState);
             }
-            Group group = repository.GetAll().FirstOrDefault(x => x.Id == model.Group);
+            Group group = groupsRepository.GetAll().FirstOrDefault(x => x.Id == model.Group);
             if (group == null)
             {
                 return BadRequest("Wrong group");

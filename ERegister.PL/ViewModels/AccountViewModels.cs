@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ERegister.DAL.Models.ViewModels
+namespace ERegister.PL.ViewModels
 {
     // Модели, возвращаемые действиями AccountController.
 
