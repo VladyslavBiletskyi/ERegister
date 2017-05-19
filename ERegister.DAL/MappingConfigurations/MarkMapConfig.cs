@@ -7,8 +7,8 @@ namespace ERegister.DAL.MappingConfigurations
     {
     public MarkMapConfig()
     {
-        HasRequired(x => x.Student).WithOptional().WillCascadeOnDelete(false);
-        HasRequired(x => x.Teacher).WithOptional().WillCascadeOnDelete(false);
+        HasRequired(x => x.Student).WithMany().WillCascadeOnDelete(false);
+        HasRequired(x => x.Teacher).WithMany().WillCascadeOnDelete(false);
         HasRequired(x=>x.Lesson).WithMany(x=>x.Marks).WillCascadeOnDelete(false);
     }
 }

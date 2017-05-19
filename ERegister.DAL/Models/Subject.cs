@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ERegister.DAL.Models
+﻿namespace ERegister.DAL.Models
 {
     public class Subject : BaseEntity
     {

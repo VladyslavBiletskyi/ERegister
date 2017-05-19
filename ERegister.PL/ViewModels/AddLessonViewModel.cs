@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace ERegister.PL.ViewModels
 {
@@ -14,5 +11,6 @@ namespace ERegister.PL.ViewModels
         public DateTime BeginingDateTime { get; set; }
 
         public string Room { get; set; }
+        public int ControllerId { get; set; }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Data.Entity;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using ERegister.DAL.Models.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;

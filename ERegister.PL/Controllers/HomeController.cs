@@ -9,5 +9,16 @@ namespace ERegister.PL.Controllers
             ViewBag.Title = "Home Page";
             return View();
         }
+
+        public ActionResult AddGroup()
+        {
+            ViewBag.Title = "Add Group";
+            return View();
+        }
+        public ActionResult AddSubject()
+        {
+            ViewBag.Title = "Add Group";
+            return View();
+        }
     }
 }

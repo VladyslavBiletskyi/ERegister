@@ -11,6 +11,7 @@ using ERegister.BLL.DTOs;
 using ERegister.BLL.Interfaces;
 using ERegister.DAL.Models;
 using ERegister.DAL.Models.Interfaces;
+using ERegister.DAL.Models.ViewModels;
 using ERegister.PL.ViewModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -56,6 +57,30 @@ namespace ERegister.PL.Controllers
             this.groupsRepository = groupsRepository;
         }
 
+        [Route("Get")]
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        public async Task<List<LessonRegisterViewModel>> GetLessons(int groupSubjectId)
+        {
+            var lessons = new List<LessonRegisterViewModel>();
+            await lessonsRepository.GetAll()
+                .Where(x => x.Subject.Id == groupSubjectId)
+                .ForEachAsync(x => lessons.Add(new LessonRegisterViewModel
+                {
+                    BeginingDateTime = x.BeginigDateTime,
+                    LessonId = x.Id
+                }));
+            return lessons;
+        }
+
+        [Route("GetLastLesson")]
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        public int GetLastLesson(int groupId)
+        {
+            Lesson lesson = lessonsRepository.GetAll().Where(x=>x.Subject.Group.Id==groupId).ToList().LastOrDefault();
+            return lesson?.Id ?? -1;
+        }
         [Route("AddLesson")]
         [HttpPost]
         [Authorize(Roles = "Teacher")]
@@ -65,12 +90,16 @@ namespace ERegister.PL.Controllers
             {
                 return BadRequest("Wrong date or time");
             }
+            if (model.ControllerId == 0)
+            {
+                return BadRequest("Wrong Controller Id");
+            }
             Subject subject = await subjectsRepository.GetAll().FirstOrDefaultAsync(x => x.Id == model.SubjectId);
             if (subject == null)
             {
                 return BadRequest("Wrong subject");
             }
-            SubjectOfTheGroup groupSubject = await groupSubjectsRepository.GetAll().FirstOrDefaultAsync(x => x.Subject == subject);
+            SubjectOfTheGroup groupSubject = await groupSubjectsRepository.GetAll().FirstOrDefaultAsync(x => x.Subject.Id == subject.Id);
             if (groupSubject == null)
             {
                 groupSubject = new SubjectOfTheGroup
@@ -82,15 +111,59 @@ namespace ERegister.PL.Controllers
                 groupSubjectsRepository.Add(groupSubject);
                 groupSubjectsRepository.SaveChanges();
             }
-            lessonsRepository.Add(new Lesson
+            Lesson lesson = new Lesson
             {
                 BeginigDateTime = model.BeginingDateTime,
                 Room = model.Room,
                 Subject = groupSubject,
                 Teacher = await UserManager.FindByIdAsync(User.Identity.GetUserId())
-            });
+            };
+            lessonsRepository.Add(lesson);
+            AttendControl control = new AttendControl { ControllerId = model.ControllerId, Lesson = lesson};
+            attendControlsRepository.Add(control);
             lessonsRepository.SaveChanges();
             return Ok();
+        }
+
+        [Route("AddMark")]
+        [HttpPost]
+        [Authorize(Roles = "Teacher")]
+        public IHttpActionResult AddMark(AddMarksViewModel model)
+        {
+            Lesson lesson = lessonsRepository.GetAll()
+                .FirstOrDefault(x => x.Id == model.LessonId);
+            if (lesson == null)
+            {
+                return BadRequest("Wrong Lesson");
+            }
+            foreach (var element in model.Marks)
+            {
+                ApplicationUser user;
+                if ((user = UserManager.FindById(element.UserId)) != null)
+                {
+                    if (lesson.Marks.All(x => x.Student.Id != user.Id))
+                    {
+                        lesson.Marks.Add(new Mark
+                        {
+                            Student = user,
+                            Teacher = UserManager.FindById(User.Identity.GetUserId()),
+                            Result = element.Score
+                        });
+                    }
+                }
+            }
+            lessonsRepository.SaveChanges();
+            return Ok();
+        }
+
+        [Route("GetGroupsForSubject")]
+        [HttpGet]
+        [Authorize(Roles = "Teacher")]
+        public List<GroupViewModel> GetGroupsForSubject(int subject)
+        {
+            List<GroupViewModel> groups = new List<GroupViewModel>();
+            groupSubjectsRepository.GetAll().Where(x => x.Subject.Id == subject).Select(x => x.Group).ToList().ForEach(x => groups.Add(new GroupViewModel { Name = x.Name, Id = x.Id }));
+            return groups;
         }
 
         [Route("Absents")]
@@ -142,8 +215,8 @@ namespace ERegister.PL.Controllers
                     BeginigDateTime = element.Lesson.BeginigDateTime,
                     AverageMark = element.AverageMark,
                     IsPresent = attendControlsRepository.GetAll()
-                                    .FirstOrDefault(x => x.Lesson == element.Lesson)
-                                    ?.Attends.Count(x => x.Student == user) != 0,
+                                    .FirstOrDefault(x => x.Lesson.Id == element.Lesson.Id)
+                                    ?.Attends.Count(x => x.Student.Id == user.Id) != 0,
                     NumberOfPresent = element.NumberOfPresent,
                     Result = element.MyMark,
                     Subject = element.Lesson.Subject.Subject.Name,

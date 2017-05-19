@@ -69,11 +69,11 @@ namespace ERegister.BLL.Services
                 {
                     Lesson = element,
                     NumberOfPresent = attendControlsRepository.GetAll()
-                                          .FirstOrDefault(x => x.Lesson == element)
+                                          .FirstOrDefault(x => x.Lesson.Id == element.Id)
                                           ?.Attends.Count ?? 0,
                     AverageMark = marksRepository.GetAll().
-                        Where(x => x.Lesson == element).Average(x => x.Result),
-                    MyMark = element.Marks.FirstOrDefault(x=>x.Student == user)?.Result??0
+                        Where(x => x.Lesson.Id == element.Id).Average(x => x.Result),
+                    MyMark = element.Marks.FirstOrDefault(x=>x.Student.Id == user.Id)?.Result??0
                 });
             }
             return answer;

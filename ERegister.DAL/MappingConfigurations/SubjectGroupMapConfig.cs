@@ -1,15 +1,16 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using ERegister.DAL.Models;
+﻿using ERegister.DAL.Models;
 
 namespace ERegister.DAL.MappingConfigurations
 {
     public class SubjectGroupMapConfig : BaseEntityConfiguration<SubjectOfTheGroup>
     {
-    public SubjectGroupMapConfig()
-    {
-        HasRequired(x => x.Teacher).WithOptional().WillCascadeOnDelete(false);
-        HasRequired(x => x.Subject).WithOptional().WillCascadeOnDelete(false);
+        public SubjectGroupMapConfig()
+        {
+            HasMany(x => x.Lessons).WithRequired(x => x.Subject).WillCascadeOnDelete(false);
+            HasRequired(x => x.Teacher).WithMany().WillCascadeOnDelete(false);
+            HasRequired(x => x.Subject).WithMany().WillCascadeOnDelete(false);
+            HasRequired(x => x.Group).WithMany(x => x.GroupSubjects).WillCascadeOnDelete(false);
+        }
     }
-}
 
 }

@@ -1,6 +1,6 @@
 ﻿@model ERegister.DAL.Models.RegisterBindingModel
 <h2>Add new teacher</h2>
-@using (Html.BeginForm("AddTeacher","api/Account",FormMethod.Post))
+@using (Html.BeginForm("AddTeacher","api/Account",FormMethod.Post,new{onsubmit="()=>{window.location.href='home/index'}"}))
 {
     @Html.AntiForgeryToken()
 
