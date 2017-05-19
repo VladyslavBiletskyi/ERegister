@@ -136,8 +136,16 @@ namespace ERegister.PL.Controllers
             {
                 return BadRequest("Wrong Lesson");
             }
+            if (model.Marks == null)
+            {
+                return BadRequest("Troubles with marks");
+            }
             foreach (var element in model.Marks)
             {
+                if (element.Score == 0)
+                {
+                    continue;
+                }
                 ApplicationUser user;
                 if ((user = UserManager.FindById(element.UserId)) != null)
                 {
