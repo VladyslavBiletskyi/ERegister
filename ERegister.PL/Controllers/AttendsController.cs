@@ -14,14 +14,14 @@ namespace ERegister.PL.Controllers
     [RoutePrefix("api/Attends")]
     public class AttendsController : ApiController
     {
-        private IAttendControlsRepository controlsRepository;
+        private const int LessonHoursLength = 1;
+        private const int LessonMinutesLength = 35;
         private IAttendsRepository attendsRepository;
         private ILessonsRepository lessonsRepository;
         private ApplicationUserManager _userManager;
 
-        public AttendsController(IAttendControlsRepository controls, IAttendsRepository attends, ILessonsRepository lessonsRepository)
+        public AttendsController(IAttendsRepository attends, ILessonsRepository lessonsRepository)
         {
-            this.controlsRepository = controls;
             this.attendsRepository = attends;
             this.lessonsRepository = lessonsRepository;
         }
@@ -52,24 +52,22 @@ namespace ERegister.PL.Controllers
             {
                 return BadRequest("User not found");
             }
-            AttendControl control = controlsRepository.GetAll().FirstOrDefault(x=>x.Id==model.ControllerId);
-            if (control == null)
-            {
-                return BadRequest("Controller not found");
-            }
-            if (control.Lesson.BeginigDateTime.Date != DateTime.Now.Date||
-                control.Lesson.BeginigDateTime.AddHours(1).AddMinutes(35) < DateTime.Now)
+
+            Lesson lesson = lessonsRepository.GetAll().Where(x => x.ControllerId==model.ControllerId &&
+              x.BeginigDateTime.Date <= DateTime.Now.Date &&
+              x.BeginigDateTime.AddHours(LessonHoursLength).AddMinutes(LessonMinutesLength) >= DateTime.Now).ToList().LastOrDefault();
+            if (lesson == null)
             {
                 return BadRequest("Wrong lesson");
             }
-            if (await attendsRepository.GetAll().AnyAsync(x => x.AttendControl.Lesson.Id == control.Lesson.Id))
+            if (await attendsRepository.GetAll().AnyAsync(x=>x.Lesson.Id==lesson.Id && x.Student.Id==user.Id))
             {
                 return BadRequest("User already attended the lesson");
             }
             attendsRepository.Add(new Attend
             {
                 Student = user,
-                AttendControl = control
+                Lesson = lesson
             });
             attendsRepository.SaveChanges();
             return Ok(user.FirstName+" "+user.LastName+" attended the lesson");

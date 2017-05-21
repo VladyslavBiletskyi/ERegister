@@ -16,7 +16,6 @@ namespace ERegister.PL.NinjectModules
             Bind<IGroupsRepository>().To<GroupsRepository>().InRequestScope();
             Bind<ILessonsRepository>().To<LessonsRepository>().InRequestScope();
             Bind<IAttendsRepository>().To<AttendsRepository>().InRequestScope();
-            Bind<IAttendControlsRepository>().To<AttendControlsRepository>().InRequestScope();
             Bind<IMarksRepository>().To<MarksRepository>().InRequestScope();
             Bind<ISubjectsRepository>().To<SubjectsRepository>().InRequestScope();
             Bind<IGroupSubjectsRepository>().To<GroupSubjectsRepository>().InRequestScope();

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ERegister.BLL.DTOs;
 using ERegister.BLL.Interfaces;
 using ERegister.DAL.Models;
@@ -12,13 +9,11 @@ namespace ERegister.BLL.Services
 {
     public class DebtsService:IDebtsService
     {
-        private IAttendControlsRepository attendControlsRepository;
         private ILessonsRepository lessonsRepository;
         private IMarksRepository marksRepository;
 
-        public DebtsService(IAttendControlsRepository attendControlsRepository, ILessonsRepository lessonsRepository, IMarksRepository marksRepository)
+        public DebtsService(ILessonsRepository lessonsRepository, IMarksRepository marksRepository)
         {
-            this.attendControlsRepository = attendControlsRepository;
             this.lessonsRepository = lessonsRepository;
             this.marksRepository = marksRepository;
         }
@@ -30,21 +25,20 @@ namespace ERegister.BLL.Services
             {
                 return null;
             }
-            List<Lesson> absents = attendControlsRepository.GetAll()
-                .Where(x => x.Lesson.Subject.Group.Id == group.Id && x.Attends.All(y=>y.Student.Id != user.Id))
-                .Select(x => x.Lesson)
-                .Distinct().ToList();
+            var lessons = lessonsRepository.GetAll()
+                .Where(x => x.Subject.Group.Id == group.Id 
+                && x.Attends.All(y => y.Student.Id != user.Id)).ToList();   
             List<LessonDto> answer = new List<LessonDto>();
-            foreach (var element in absents)
+            foreach (var element in lessons)
             {
                 answer.Add(new LessonDto
                 {
                     Lesson = element,
-                    NumberOfPresent = attendControlsRepository.GetAll()
-                                          .FirstOrDefault(x => x.Lesson.Id == element.Id)
+                    NumberOfPresent = lessonsRepository.GetAll()
+                                          .FirstOrDefault(x => x.Id == element.Id)
                                           ?.Attends.Count ?? 0,
-                    AverageMark = marksRepository.GetAll().
-                    Where(x => x.Lesson.Id == element.Id).Average(x => x.Result)
+                    AverageMark = marksRepository.GetAll().Any()?marksRepository.GetAll().
+                    Where(x => x.Lesson.Id == element.Id).Average(x=>x.Result):0
                 });
             }
             return answer;
@@ -68,11 +62,11 @@ namespace ERegister.BLL.Services
                 answer.Add(new LessonDto
                 {
                     Lesson = element,
-                    NumberOfPresent = attendControlsRepository.GetAll()
-                                          .FirstOrDefault(x => x.Lesson.Id == element.Id)
+                    NumberOfPresent = lessonsRepository.GetAll()
+                                          .FirstOrDefault(x => x.Id == element.Id)
                                           ?.Attends.Count ?? 0,
-                    AverageMark = marksRepository.GetAll().
-                        Where(x => x.Lesson.Id == element.Id).Average(x => x.Result),
+                    AverageMark = marksRepository.GetAll().Any() ? marksRepository.GetAll().
+                        Where(x => x.Lesson.Id == element.Id).Average(x => x.Result):0,
                     MyMark = element.Marks.FirstOrDefault(x=>x.Student.Id == user.Id)?.Result??0
                 });
             }
@@ -96,11 +90,11 @@ namespace ERegister.BLL.Services
                 answer.Add(new LessonDto
                 {
                     Lesson = element,
-                    NumberOfPresent = attendControlsRepository.GetAll()
-                                          .FirstOrDefault(x => x.Lesson.Id == element.Id)
+                    NumberOfPresent = lessonsRepository.GetAll()
+                                          .FirstOrDefault(x => x.Id == element.Id)
                                           ?.Attends.Count ?? 0,
-                    AverageMark = marksRepository.GetAll().
-                        Where(x => x.Lesson.Id == element.Id).Average(x => x.Result),
+                    AverageMark = marksRepository.GetAll().Any() ? marksRepository.GetAll().
+                        Where(x => x.Lesson.Id == element.Id).Average(x => x.Result):0,
                     MyMark = element.Marks.FirstOrDefault(x => x.Student.Id == user.Id)?.Result ?? 0
                 });
             }

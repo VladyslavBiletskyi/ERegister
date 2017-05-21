@@ -53,8 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MappingConfigurations\AttendMapConfig.cs" />
     <Compile Include="Models\ApplicationRole.cs" />
-    <Compile Include="MappingConfigurations\AttendControlMapConfig.cs" />
     <Compile Include="MappingConfigurations\ApplicationUserMapConfig.cs" />
     <Compile Include="MappingConfigurations\BaseEntityMapConfig.cs" />
     <Compile Include="MappingConfigurations\UserLoginMapConfig.cs" />
@@ -69,7 +69,6 @@
     <Compile Include="Models\Identity\ApplicationRoleManager.cs" />
     <Compile Include="Models\Identity\ApplicationUserManager.cs" />
     <Compile Include="Models\Interfaces\IAttendsRepository.cs" />
-    <Compile Include="Models\Interfaces\IAttendControlsRepository.cs" />
     <Compile Include="Models\Interfaces\IGroupSubjectsRepository.cs" />
     <Compile Include="Models\Interfaces\ISubjectsRepository.cs" />
     <Compile Include="Models\Interfaces\ILessonsRepository.cs" />
@@ -77,7 +76,6 @@
     <Compile Include="Models\Interfaces\IGroupsRepository.cs" />
     <Compile Include="Models\Repositories\IdentityUnitOfWork.cs" />
     <Compile Include="Models\Attend.cs" />
-    <Compile Include="Models\AttendControl.cs" />
     <Compile Include="Models\ERegisterDbContext.cs" />
     <Compile Include="Models\Group.cs" />
     <Compile Include="Models\ApplicationUser.cs" />
@@ -86,7 +84,6 @@
     <Compile Include="Models\Interfaces\IRepository.cs" />
     <Compile Include="Models\Lesson.cs" />
     <Compile Include="Models\Mark.cs" />
-    <Compile Include="Models\Repositories\AttendControlsRepository.cs" />
     <Compile Include="Models\Repositories\AttendsRepository.cs" />
     <Compile Include="Models\Repositories\BaseRepository.cs" />
     <Compile Include="Models\Repositories\GroupSubjectsRepository.cs" />

@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
 using ERegister.BLL.DTOs;
 using ERegister.BLL.Interfaces;
 using ERegister.DAL.Models;
@@ -25,7 +22,6 @@ namespace ERegister.PL.Controllers
     {
 
         private ILessonsRepository lessonsRepository;
-        private IAttendControlsRepository attendControlsRepository;
         private ISubjectsRepository subjectsRepository;
         private IGroupSubjectsRepository groupSubjectsRepository;
         private IGroupsRepository groupsRepository;
@@ -47,10 +43,9 @@ namespace ERegister.PL.Controllers
             }
         }
 
-        public LessonsController(ILessonsRepository lessons, IAttendControlsRepository attends, IDebtsService attendsService, ISubjectsRepository subjectsRepository, IGroupSubjectsRepository groupSubjectsRepository, IGroupsRepository groupsRepository)
+        public LessonsController(ILessonsRepository lessons,IDebtsService attendsService, ISubjectsRepository subjectsRepository, IGroupSubjectsRepository groupSubjectsRepository, IGroupsRepository groupsRepository)
         {
             this.lessonsRepository = lessons;
-            this.attendControlsRepository = attends;
             this.debtsService = attendsService;
             this.subjectsRepository = subjectsRepository;
             this.groupSubjectsRepository = groupSubjectsRepository;
@@ -81,6 +76,7 @@ namespace ERegister.PL.Controllers
             Lesson lesson = lessonsRepository.GetAll().Where(x=>x.Subject.Group.Id==groupId).ToList().LastOrDefault();
             return lesson?.Id ?? -1;
         }
+
         [Route("AddLesson")]
         [HttpPost]
         [Authorize(Roles = "Teacher")]
@@ -99,7 +95,8 @@ namespace ERegister.PL.Controllers
             {
                 return BadRequest("Wrong subject");
             }
-            SubjectOfTheGroup groupSubject = await groupSubjectsRepository.GetAll().FirstOrDefaultAsync(x => x.Subject.Id == subject.Id);
+            SubjectOfTheGroup groupSubject = await groupSubjectsRepository.GetAll()
+                .FirstOrDefaultAsync(x => x.Subject.Id == subject.Id);
             if (groupSubject == null)
             {
                 groupSubject = new SubjectOfTheGroup
@@ -116,12 +113,18 @@ namespace ERegister.PL.Controllers
                 BeginigDateTime = model.BeginingDateTime,
                 Room = model.Room,
                 Subject = groupSubject,
-                Teacher = await UserManager.FindByIdAsync(User.Identity.GetUserId())
+                Teacher = await UserManager.FindByIdAsync(User.Identity.GetUserId()),
+                ControllerId=model.ControllerId
             };
             lessonsRepository.Add(lesson);
-            AttendControl control = new AttendControl { ControllerId = model.ControllerId, Lesson = lesson};
-            attendControlsRepository.Add(control);
-            lessonsRepository.SaveChanges();
+            try
+            {
+                lessonsRepository.SaveChanges();
+            }
+            catch (Exception e)
+            {
+
+            }
             return Ok();
         }
 
@@ -222,9 +225,9 @@ namespace ERegister.PL.Controllers
                 {
                     BeginigDateTime = element.Lesson.BeginigDateTime,
                     AverageMark = element.AverageMark,
-                    IsPresent = attendControlsRepository.GetAll()
-                                    .FirstOrDefault(x => x.Lesson.Id == element.Lesson.Id)
-                                    ?.Attends.Count(x => x.Student.Id == user.Id) != 0,
+                    IsPresent = lessonsRepository.GetAll()
+                                    .FirstOrDefault(x => x.Id == element.Lesson.Id)
+                                    ?.Attends.Any(x => x.Student.Id == user.Id)??false,
                     NumberOfPresent = element.NumberOfPresent,
                     Result = element.MyMark,
                     Subject = element.Lesson.Subject.Subject.Name,
