@@ -152,7 +152,8 @@ namespace ERegister.PL.Controllers
                 ApplicationUser user;
                 if ((user = UserManager.FindById(element.UserId)) != null)
                 {
-                    if (lesson.Marks.All(x => x.Student.Id != user.Id))
+                    if (lesson.Marks.All(x => x.Student.Id != user.Id) && 
+                        lesson.Attends.Any(x=>x.Student.Id==user.Id))
                     {
                         lesson.Marks.Add(new Mark
                         {
