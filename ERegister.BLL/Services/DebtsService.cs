@@ -61,8 +61,8 @@ namespace ERegister.BLL.Services
                 .Where(x => x.Subject.Group.Id == group.Id
                             && x.BeginigDateTime < nowDate
                             && x.Marks.Count > 0
-                            && x.Marks.Count(y => y.Student.Id == user.Id
-                                                  && y.Result < 60) == 0)
+                            && x.Marks.Any(y => y.Student.Id == user.Id
+                                                  && y.Result < 60))
                 .Select(x => x)
                 .Distinct()
                 .ToList();

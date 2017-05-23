@@ -174,7 +174,17 @@ namespace ERegister.PL.Controllers
         public List<GroupViewModel> GetGroupsForSubject(int subject)
         {
             List<GroupViewModel> groups = new List<GroupViewModel>();
-            groupSubjectsRepository.GetAll().Where(x => x.Subject.Id == subject).Select(x => x.Group).ToList().ForEach(x => groups.Add(new GroupViewModel { Name = x.Name, Id = x.Id }));
+            DateTime minDay = DateTime.Now.Date.AddDays(-1);
+            groupSubjectsRepository.GetAll().Where(x => x.Subject.Id == subject ).Select(x => x.Group).ToList().ForEach(
+                x =>
+                {
+                    if (x.GroupSubjects.FirstOrDefault(y => y.Subject.Id == subject)
+                            ?.Lessons.LastOrDefault()
+                            ?.BeginigDateTime >= minDay)
+                    {
+                        groups.Add(new GroupViewModel {Name = x.Name, Id = x.Id});
+                    }
+                });
             return groups;
         }
 
